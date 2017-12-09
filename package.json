@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lodash.foreach": "^4.5.0"
+    "lodash.foreach": "^4.5.0",
+    "tokenizer2": "^2.0.0"
   }
 }
