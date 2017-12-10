@@ -9,7 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "lodash.differenceby": "^4.8.0",
     "lodash.foreach": "^4.5.0",
+    "lodash.groupby": "^4.6.0",
+    "lodash.reduce": "^4.6.0",
+    "lodash.size": "^4.2.0",
     "tokenizer2": "^2.0.0"
   }
 }

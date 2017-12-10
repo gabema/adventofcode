@@ -38,13 +38,11 @@ rl.on('line', (input) => {
     t.addRule(/^{$/, 'open group');
     t.addRule(/^}$/, 'close group');
     t.addRule(/^.$/, 'noise');
-    
     t.on('end', () => {
         console.log({totalScore});
     });
     
     t.on('data', data => {
-        const state = {totalScore, groupLevel, processingGarbage};
         const token = data.src;
         const type = data.type;
         // also can get line/col from data if important
