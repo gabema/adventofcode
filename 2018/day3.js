@@ -5,8 +5,6 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-// #123 @ 3,2: 5x4
-
 const pattern = /#(\d+) @ (\d+),(\d+): (\d+)x(\d+)/;
 
 let accumSpace = {};
@@ -48,7 +46,6 @@ const combineRow = (row = [], x, len, id) => {
 const countOverlappingClaims = patch => {
   let overlaps = 0;
   forEach(patch, entry => {
-//    console.log(entry);
     entry.forEach(square => {
       if (square === -1) {
         overlaps++;
@@ -61,7 +58,6 @@ const countOverlappingClaims = patch => {
 rl.on('line', (input) => {
   const processedEntry = processEntry(input);
   if (processedEntry === null) {
-//    console.log(accumSpace);
     console.log(countOverlappingClaims(accumSpace));
     return;
   }
