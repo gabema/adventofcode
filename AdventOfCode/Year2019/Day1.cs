@@ -3,7 +3,7 @@ using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Advent2020.Year2019
+namespace AdventOfCode.Year2019
 {
     public class Day1
     {

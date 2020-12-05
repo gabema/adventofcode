@@ -1,5 +1,4 @@
-﻿using Advent2020;
-using System.Linq;
+﻿using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
