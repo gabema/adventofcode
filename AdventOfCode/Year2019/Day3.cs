@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace AdventOfCode.Year2019
@@ -19,12 +20,11 @@ namespace AdventOfCode.Year2019
     public class Day3Lexer : SimpleLexer<Day3Tokens>
     {
         private static readonly List<Tuple<Day3Tokens, string>> NewList = new List<Tuple<Day3Tokens, string>> {
-            Tuple.Create(Day3Tokens.Left, @"^l"),
-            Tuple.Create(Day3Tokens.Right, @"^r"),
-            Tuple.Create(Day3Tokens.Down, @"^d"),
-            Tuple.Create(Day3Tokens.Up, @"^u"),
+            Tuple.Create(Day3Tokens.Left, @"^l\d+"),
+            Tuple.Create(Day3Tokens.Right, @"^r\d+"),
+            Tuple.Create(Day3Tokens.Down, @"^d\d+"),
+            Tuple.Create(Day3Tokens.Up, @"^u\d+"),
             Tuple.Create(Day3Tokens.Seperator, @"^,"),
-            Tuple.Create(Day3Tokens.Value, @"^\d+"),
             Tuple.Create(Day3Tokens.SequenceTerminator, @""),
         };
 
@@ -32,29 +32,65 @@ namespace AdventOfCode.Year2019
         { }
     }
 
-    public class Square
+    public class Spot
     {
-        public int Left { get; private set; }
-        public int Right { get; private set; }
-        public int Top { get; private set; }
-        public int Bottom { get; private set; }
-
         public int X { get; private set; }
         public int Y { get; private set; }
 
-        public Square()
+        public int Distance { get; private set; }
+
+        public Spot(int x, int y, int distance = 0)
         {
-            Left = Right = Top = Bottom = X = Y = 0;
+            X = x;
+            Y = y;
+            Distance = distance;
         }
 
-        public Square Overlap(Square other)
+        public int ManhattanDistanceFrom(Spot s)
         {
-            var newSquare = new Square();
-            newSquare.Left = Math.Max(Left, other.Left);
-            newSquare.Right = Math.Min(Right, other.Right);
-            newSquare.Top = Math.Min(Top, other.Top);
-            newSquare.Bottom = Math.Max(Bottom, other.Bottom);
-            return newSquare;
+            return Math.Abs(X - s.X) + Math.Abs(Y - s.Y);
+        }
+
+        public int SignalDistance(Spot s)
+        {
+            return s.Distance + Distance + 2;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(X, Y);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || obj.GetType() != typeof(Spot)) return false;
+
+            return GetHashCode() == ((Spot)obj).GetHashCode();
+        }
+    }
+
+    public class Square
+    {
+        private Dictionary<int, Spot> spots;
+        private Spot currentSpot;
+
+        public Square()
+        {
+            currentSpot = new Spot(0, 0);
+            spots = new Dictionary<int, Spot>
+            {
+                [currentSpot.GetHashCode()] = currentSpot
+            };
+        }
+
+        public Spot GetSpot(Spot s)
+        {
+            return spots[s.GetHashCode()];
+        }
+
+        public IEnumerable<Spot> Intersect(Square other)
+        {
+            return spots.Values.Intersect(other.spots.Values);
         }
 
         public void Move(Day3Tokens direction, int distance)
@@ -62,41 +98,64 @@ namespace AdventOfCode.Year2019
             switch (direction)
             {
                 case Day3Tokens.Down:
-                {
-                    Y -= distance;
-                    if (Bottom > Y)
                     {
-                        Bottom = Y;
-                    }
+                        Spot newSpot = new Spot(currentSpot.X, currentSpot.Y - distance, currentSpot.Distance + distance);
+                        AddSpotsBetween(currentSpot, newSpot);
+                        spots.TryAdd(newSpot.GetHashCode(), newSpot);
+                        currentSpot = newSpot;
                         break;
-                }
+                    }
                 case Day3Tokens.Up:
                     {
-                        Y += distance;
-                        if (Y > Top)
-                        {
-                            Top = Y;
-                        }
+                        Spot newSpot = new Spot(currentSpot.X, currentSpot.Y + distance, currentSpot.Distance + distance);
+                        AddSpotsBetween(currentSpot, newSpot);
+                        spots.TryAdd(newSpot.GetHashCode(), newSpot);
+                        currentSpot = newSpot;
                         break;
                     }
                 case Day3Tokens.Left:
                     {
-                        X -= distance;
-                        if (Left > X)
-                        {
-                            Left = X;
-                        }
+                        Spot newSpot = new Spot(currentSpot.X - distance, currentSpot.Y, currentSpot.Distance + distance);
+                        AddSpotsBetween(currentSpot, newSpot);
+                        spots.TryAdd(newSpot.GetHashCode(), newSpot);
+                        currentSpot = newSpot;
                         break;
                     }
                 case Day3Tokens.Right:
                     {
-                        X += distance;
-                        if (X > Right)
-                        {
-                            Right = X;
-                        }
+                        Spot newSpot = new Spot(currentSpot.X + distance, currentSpot.Y, currentSpot.Distance + distance);
+                        AddSpotsBetween(currentSpot, newSpot);
+                        spots.TryAdd(newSpot.GetHashCode(), newSpot);
+                        currentSpot = newSpot;
                         break;
                     }
+            }
+        }
+
+        private void AddSpotsBetween(Spot currentSpot, Spot newSpot)
+        {
+            int distance = newSpot.Distance;
+            int y = newSpot.Y;
+            while (currentSpot.Y < y)
+            {
+                Spot ns = new Spot(currentSpot.X, y--, --distance);
+                spots.TryAdd(ns.GetHashCode(), ns);
+            }
+            while (currentSpot.Y > y)
+            {
+                Spot ns = new Spot(currentSpot.X, y++, --distance);
+                spots.TryAdd(ns.GetHashCode(), ns);
+            }
+            int x = newSpot.X;
+            while (currentSpot.X < x)
+            {
+                Spot ns = new Spot(x--, currentSpot.Y, --distance);
+                spots.TryAdd(ns.GetHashCode(), ns);
+            }
+            while (currentSpot.X > x)
+            {
+                Spot ns = new Spot(x++, currentSpot.Y, --distance);
+                spots.TryAdd(ns.GetHashCode(), ns);
             }
         }
     }
@@ -105,7 +164,6 @@ namespace AdventOfCode.Year2019
     {
         private static Square PopulateSquare(IEnumerable<Token<Day3Tokens>> iterable)
         {
-            Day3Tokens currentToken = Day3Tokens.Seperator;
             var square = new Square();
             foreach (Token<Day3Tokens> token in iterable)
             {
@@ -115,10 +173,7 @@ namespace AdventOfCode.Year2019
                     case Day3Tokens.Up:
                     case Day3Tokens.Left:
                     case Day3Tokens.Right:
-                        currentToken = token.TokenType;
-                        break;
-                    case Day3Tokens.Value:
-                        square.Move(currentToken, int.Parse(token.Value));
+                        square.Move(token.TokenType, int.Parse(token.Value.Substring(1)));
                         break;
                 }
             }
@@ -126,9 +181,9 @@ namespace AdventOfCode.Year2019
         }
 
         [Fact]
-        void TestSample1()
+        void PartA()
         {
-            var stream = InputClient.GetFileStream(2019, 3, "a");
+            var stream = InputClient.GetFileStream(2019, 3, "");
             using var reader = new StreamReader(stream);
             var input = reader.ReadLine();
             var lexer = new Day3Lexer();
@@ -137,8 +192,34 @@ namespace AdventOfCode.Year2019
 
             input = reader.ReadLine();
             IEnumerable<Token<Day3Tokens>> right = lexer.Tokenize(input);
-            var rightSquare = PopulateSquare(left);
+            var rightSquare = PopulateSquare(right);
 
+            var overlaps = leftSquare.Intersect(rightSquare);
+            var originSpot = new Spot(0, 0);
+            int minDistance = overlaps.Except(new List<Spot> { originSpot }).Min(s => s.ManhattanDistanceFrom(originSpot));
+            Assert.Equal(557, minDistance);
+        }
+
+        [Fact]
+        void PartB()
+        {
+            var stream = InputClient.GetFileStream(2019, 3, "");
+            using var reader = new StreamReader(stream);
+            var input = reader.ReadLine();
+            var lexer = new Day3Lexer();
+            IEnumerable<Token<Day3Tokens>> left = lexer.Tokenize(input);
+            var leftSquare = PopulateSquare(left);
+
+            input = reader.ReadLine();
+            IEnumerable<Token<Day3Tokens>> right = lexer.Tokenize(input);
+            var rightSquare = PopulateSquare(right);
+
+            var overlaps = leftSquare.Intersect(rightSquare);
+            var originSpot = new Spot(0, 0);
+            int minDistance = overlaps.Except(new List<Spot> { originSpot })
+                .Select(s => leftSquare.GetSpot(s).SignalDistance(rightSquare.GetSpot(s)))
+                .Min();
+            Assert.Equal(56410, minDistance);
         }
     }
 }
