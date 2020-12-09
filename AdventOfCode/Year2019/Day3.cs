@@ -32,6 +32,7 @@ namespace AdventOfCode.Year2019
         { }
     }
 
+    // Use C# 9 records
     public class Spot
     {
         public int X { get; private set; }
@@ -58,6 +59,7 @@ namespace AdventOfCode.Year2019
 
         public override int GetHashCode()
         {
+            // TODO Attempt to replace with C# 9 Record classes
             return HashCode.Combine(X, Y);
         }
 
@@ -65,7 +67,7 @@ namespace AdventOfCode.Year2019
         {
             if (obj == null || obj.GetType() != typeof(Spot)) return false;
 
-            return GetHashCode() == ((Spot)obj).GetHashCode();
+            return X == ((Spot)obj).X && Y == ((Spot)obj).Y;
         }
     }
 
