@@ -11,7 +11,15 @@ namespace AdventOfCode.Year2019
     {
         Add = 1,
         Multiply = 2,
+        Input = 3,
+        Output = 4,
         Halt = 99
+    }
+
+    public enum Modes
+    {
+        Position = 0,
+        Immediate = 1
     }
 
     public enum Day2Item
@@ -40,29 +48,89 @@ namespace AdventOfCode.Year2019
             instructionPointerIndex = 0;
         }
 
-        // Runs the program until it reaches a halt instruction.
-        public void Run()
+        private (OpCodes code, Modes[] paramModes) ProcessInstruction(int input)
         {
-            OpCodes opCode;
-
-            while ((opCode = (OpCodes)content[instructionPointerIndex]) != OpCodes.Halt)
+            var inputStr = input.ToString("00000");
+            var paramModes = new Modes[3]
             {
-                int inputA = content[content[instructionPointerIndex + 1]];
-                int inputB = content[content[instructionPointerIndex + 2]];
-                switch (opCode)
+                (Modes)int.Parse(inputStr[^3..^2]),
+                (Modes)int.Parse(inputStr[^4..^3]),
+                (Modes)int.Parse(inputStr[^5..^4])
+            };
+            return ((OpCodes)int.Parse(inputStr[^2..]), paramModes);
+        }
+
+        // Runs the program until it reaches a halt instruction.
+        public void Run(Queue<int> inputs, Queue<int> outputs)
+        {
+            int instructionCounter = 0;
+            (OpCodes code, Modes[] paramModes) previousInstruction = default;
+            (OpCodes code, Modes[] paramModes) instruction;
+
+            while ((instruction = ProcessInstruction(content[instructionPointerIndex])).code != OpCodes.Halt)
+            {
+                int nextInstruction = 1;
+                switch (instruction.code)
                 {
                     case OpCodes.Add:
                         {
-                            content[content[instructionPointerIndex + 3]] = inputA + inputB;
+                            int inputA = instruction.paramModes[0] == Modes.Position ? content[content[instructionPointerIndex + 1]] : content[instructionPointerIndex + 1];
+                            int inputB = instruction.paramModes[1] == Modes.Position ? content[content[instructionPointerIndex + 2]] : content[instructionPointerIndex + 2];
+                            if (instruction.paramModes[2] == Modes.Position)
+                            {
+                                content[content[instructionPointerIndex + 3]] = inputA + inputB;
+                            }
+                            else
+                            {
+                                content[instructionPointerIndex + 3] = inputA + inputB;
+                            }
+                            nextInstruction += 3;
                             break;
                         }
                     case OpCodes.Multiply:
                         {
-                            content[content[instructionPointerIndex + 3]] = inputA * inputB;
+                            int inputA = instruction.paramModes[0] == Modes.Position ? content[content[instructionPointerIndex + 1]] : content[instructionPointerIndex + 1];
+                            int inputB = instruction.paramModes[1] == Modes.Position ? content[content[instructionPointerIndex + 2]] : content[instructionPointerIndex + 2];
+                            if (instruction.paramModes[2] == Modes.Position)
+                            {
+                                content[content[instructionPointerIndex + 3]] = inputA * inputB;
+                            }
+                            else
+                            {
+                                content[instructionPointerIndex + 3] = inputA * inputB;
+                            }
+                            nextInstruction += 3;
+                            break;
+                        }
+                    case OpCodes.Input:
+                        {
+                            int input = inputs.Dequeue();
+                            if (instruction.paramModes[0] == Modes.Position)
+                            {
+                                content[content[instructionPointerIndex + 1]] = input;
+                            }
+                            else
+                            {
+                                content[instructionPointerIndex + 1] = input;
+                            }
+                            nextInstruction += 1;
+                            break;
+                        }
+                    case OpCodes.Output:
+                        {
+                            var outputVal = instruction.paramModes[0] == Modes.Position ? content[content[instructionPointerIndex + 1]] : content[instructionPointerIndex + 1];
+                            outputs.Enqueue(outputVal);
+                            if (outputVal != 0)
+                            {
+                                outputVal += 1;
+                            }
+                            nextInstruction += 1;
                             break;
                         }
                 }
-                instructionPointerIndex += 4;
+                instructionPointerIndex += nextInstruction;
+                previousInstruction = instruction;
+                instructionCounter++;
             }
         }
 
@@ -100,7 +168,7 @@ namespace AdventOfCode.Year2019
             var computer = new OpCodeComputer(ReadComputer().ToList());
             computer.SetValueAt(1, 12);
             computer.SetValueAt(2, 2);
-            computer.Run();
+            computer.Run(new Queue<int>(), new Queue<int>());
 
             Assert.Equal(9706670, computer.ValueAt(0));
         }
@@ -118,7 +186,7 @@ namespace AdventOfCode.Year2019
                     computer = new OpCodeComputer(initialState.ToList());
                     computer.SetValueAt(1, opCode1);
                     computer.SetValueAt(2, opCode2);
-                    computer.Run();
+                    computer.Run(new Queue<int>(), new Queue<int>());
                 }
             }
             int val = 100 * computer.ValueAt(1) + computer.ValueAt(2);

@@ -71,7 +71,6 @@ namespace AdventOfCode.Year2020
         {
             var collection = new BoundedCollection(25);
             var badValue = 0UL;
-            string input;
             foreach (var numVal in GetNumbers())
             {
                 if (!collection.Add(numVal))
@@ -90,7 +89,6 @@ namespace AdventOfCode.Year2020
             var collection = new BoundedCollection(25);
             var fullCollection = new List<ulong>();
             var invalidNumberCollection = new HashSet<ulong>();
-            string input;
             ulong invalidContiguousSum = 0UL;
             foreach (var numVal in GetNumbers())
             {
