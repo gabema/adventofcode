@@ -49,6 +49,12 @@ namespace AdventOfCode.Year2020
             var orderedJoltage = input.OrderBy(a => a).ToList();
             orderedJoltage.Insert(0, 0);
             orderedJoltage.Add(orderedJoltage[orderedJoltage.Count - 1] + 3);
+
+            int[] outlets = orderedJoltage.ToArray();
+            int right = outlets.Length - 1;
+
+            ulong count = NumberOfPermutations(outlets, right);
+
             var joltageDiffs = new List<int>(orderedJoltage.Count - 1);
             for (int i = 1; i < orderedJoltage.Count; i++)
             {
@@ -62,6 +68,8 @@ namespace AdventOfCode.Year2020
             arrangements.Push(joltageDiffs);
             uniqueArrangements.Add(arrangeString);
             ulong numArrangements = 0;
+
+
             // Do not uncomment unless you want to peg the cpu
             //while (arrangements.Count > 0)
             {
@@ -191,6 +199,19 @@ namespace AdventOfCode.Year2020
             }
 
             Assert.Equal(19208UL, numArrangements);
+        }
+
+        private ulong NumberOfPermutations(int[] outlets, int candidate)
+        {
+            if (candidate > 0 && outlets[candidate + 1] - outlets[candidate-1] < 4)
+            {
+                var newOutlets = new int[outlets.Length - 1];
+                
+                outlets.CopyTo(newOutlets, candidate + 1);
+                {
+                };
+            }
+            return default;
         }
 
         public IEnumerable<List<int>> ReducingSets(List<int> lists)

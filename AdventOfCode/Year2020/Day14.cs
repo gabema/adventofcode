@@ -92,13 +92,13 @@ namespace AdventOfCode.Year2020
         {
             Decoder14 system = LoadSystem();
 
-            Assert.Equal(165UL, system.SumValues());
+            Assert.Equal(17481577045893UL, system.SumValues());
         }
 
         [Fact]
         public void Part2()
         {
-            Assert.Equal(true, true);
+            Assert.Equal(true, false);
         }
 
     }

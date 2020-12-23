@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Xunit;
 using Xunit.Abstractions;
@@ -103,7 +102,8 @@ namespace AdventOfCode.Year2020
             var buses = new List<Bus>(ReadBuses(reader, true));
 
             var scanner = new BusScanner();
-            var timestamp = scanner.TimestampOfOrder(buses);
+            // var timestamp = scanner.TimestampOfOrder(buses);
+            var timestamp = 0UL;
 
             Assert.Equal(1068781UL, timestamp);
         }
