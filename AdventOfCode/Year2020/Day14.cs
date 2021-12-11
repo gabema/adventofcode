@@ -69,7 +69,7 @@ namespace AdventOfCode.Year2020
 
         public Decoder14 LoadSystem()
         {
-            using var reader = new StreamReader(InputClient.GetFileStream(2020, 14, ""));
+            using var reader = InputClient.GetFileStreamReader(2020, 14, "");
             var system = new Decoder14();
             string input;
 
@@ -98,7 +98,7 @@ namespace AdventOfCode.Year2020
         [Fact]
         public void Part2()
         {
-            Assert.Equal(true, false);
+            Assert.True(false);
         }
 
     }

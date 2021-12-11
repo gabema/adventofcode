@@ -105,8 +105,7 @@ namespace AdventOfCode.Year2020
 
         private static List<List<Day3Items>> LoadMap()
         {
-            var stream = InputClient.GetFileStream(2020, 3, "");
-            using var reader = new StreamReader(stream);
+            using var reader = InputClient.GetFileStreamReader(2020, 3, "");
             var input = reader.ReadLine();
             var lexer = new Day3Lexer();
             var mapBuilder = new MapBuilder();

@@ -23,6 +23,8 @@ namespace AdventOfCode
             return await response.Content.ReadAsStreamAsync();
         }
 
+        public static StreamReader GetFileStreamReader(int year, int day, string variant = "") => new StreamReader(GetFileStream(year, day, variant));
+
         /// <summary>
         ///  https://docs.microsoft.com/en-us/dotnet/api/system.text.regularexpressions.regex?view=netcore-3.1
         /// </summary>
@@ -33,7 +35,7 @@ namespace AdventOfCode
         /// <returns></returns>
         public static IEnumerable<GroupCollection> GetRegularExpressionRows(int year, int day, string variant, string regEx)
         {
-            using StreamReader reader = new StreamReader(GetFileStream(year, day, variant));
+            using StreamReader reader = GetFileStreamReader(year, day, variant);
             string line;
 
             Regex rx = new Regex(regEx, RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -49,7 +51,7 @@ namespace AdventOfCode
 
         public static IEnumerable<int> GetIntInput(int year, int day, string variant = "")
         {
-            using StreamReader reader = new StreamReader(GetFileStream(year, day, variant));
+            using StreamReader reader = GetFileStreamReader(year, day, variant);
             string line;
             while ((line = reader.ReadLine()) != null)
             {

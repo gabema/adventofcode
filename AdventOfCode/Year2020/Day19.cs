@@ -134,7 +134,7 @@ namespace AdventOfCode.Year2020
         [Fact]
         public void Part2()
         {
-            Assert.Equal(true, false);
+            Assert.True(false);
         }
     }
 }

@@ -144,8 +144,7 @@ namespace AdventOfCode.Year2020
 
         private IEnumerable<Passport> GetPossiblePassports()
         {
-            var stream = InputClient.GetFileStream(2020, 4, "");
-            using var reader = new StreamReader(stream);
+            using var reader = InputClient.GetFileStreamReader(2020, 4, "");
             var input = reader.ReadLine();
             var lexer = new Day4Lexer();
             var passport = new Passport();
