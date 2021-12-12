@@ -12,7 +12,9 @@ namespace AdventOfCode
         public static Stream GetFileStream(int year, int day, string variant = "")
         {
             var directory = new DirectoryInfo(typeof(InputClient).Assembly.Location);
-            var inputFile = new FileInfo(Path.Combine(directory.Parent.FullName, $"Year{year}\\Day{day}{variant}.txt"));
+            var inputFile = new FileInfo(
+                Path.Combine(directory.Parent.FullName, 
+                    Path.Combine($"Year{year}", $"Day{day}{variant}.txt")));
             return inputFile.OpenRead();
         }
 

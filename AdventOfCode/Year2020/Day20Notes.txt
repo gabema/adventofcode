@@ -1,0 +1,15 @@
+﻿
+3 x 3 tiles
+
+A B C
+D E F
+G H I
+
+TWO SIDES MATCHING
+A, C, G, I
+
+Three Sides MATCHING
+B, D, F, H
+
+Four Sides MATCHING
+E

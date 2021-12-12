@@ -99,6 +99,7 @@ public class TileImage : IEquatable<TileImage>
     public override int GetHashCode() => HashCode.Combine(Top, Left, Right, Bottom);
 }
 
+// https://adventofcode.com/2020/day/20
 public class Day20
 {
     private static void AddTileImageToSetDictionary(Dictionary<ushort, ISet<TileImage>>  dictSet, TileImage tile, ushort value)
