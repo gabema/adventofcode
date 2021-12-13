@@ -1,9 +1,9 @@
 ﻿
 3 x 3 tiles
 
-A B C
-D E F
-G H I
+A B C            G D A
+D E F  Same As   H E B
+G H I            I F C
 
 TWO SIDES MATCHING
 A, C, G, I
@@ -13,3 +13,8 @@ B, D, F, H
 
 Four Sides MATCHING
 E
+
+
+GDA
+HEB
+IFC

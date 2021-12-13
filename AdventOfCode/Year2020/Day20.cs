@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace AdventOfCode.Year2020;
 
@@ -61,7 +62,8 @@ public class TileImageBuilder
             Top = top,
             Bottom = bottom,
             Left = left,
-            Right = right
+            Right = right,
+            Size = _size
         };
     }
 
@@ -74,10 +76,11 @@ public class TileImageBuilder
 public class TileImage : IEquatable<TileImage>
 {
     public int TileNumber { get; init; }
-    public ushort Top { get; init; }
-    public ushort Left { get; init; }
-    public ushort Right { get; init; }
-    public ushort Bottom { get; init; }
+    public ushort Top { get; set; }
+    public ushort Left { get; set; }
+    public ushort Right { get; set; }
+    public ushort Bottom { get; set; }
+    public int Size { get; init; }
 
     public bool Equals(TileImage? other)
     {
@@ -88,7 +91,8 @@ public class TileImage : IEquatable<TileImage>
             && Top == other.Top
             && Left == other.Left
             && Right == other.Right
-            && Bottom == other.Bottom;
+            && Bottom == other.Bottom
+            && Size == other.Size;
     }
 
     public override bool Equals(object obj)
@@ -97,11 +101,44 @@ public class TileImage : IEquatable<TileImage>
     }
 
     public override int GetHashCode() => HashCode.Combine(Top, Left, Right, Bottom);
+
+    internal void FlipVertical()
+    {
+        var holdValue = FlipValue(Top, Size);
+        Top = FlipValue(Bottom, Size);
+        Bottom = holdValue;
+        holdValue = Left;
+        Left = Right;
+        Right = holdValue;
+    }
+
+    private static ushort FlipValue(ushort oldValue, int size)
+    {
+        ushort newValue = 0;
+        for (var i=0; i<size; i++)
+        {
+            var newBit = (ushort)(1 & oldValue);
+            newValue |= (ushort)(newBit << (size - i));
+            oldValue = (ushort)(oldValue >> 1);
+        }
+        return newValue;
+    }
+
+    public override string ToString()
+    {
+        return $"Top = {Top:N3}";
+    }
 }
 
 // https://adventofcode.com/2020/day/20
 public class Day20
 {
+    private readonly ITestOutputHelper _output;
+    public Day20(ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
     private static void AddTileImageToSetDictionary(Dictionary<ushort, ISet<TileImage>>  dictSet, TileImage tile, ushort value)
     {
         if (!dictSet.ContainsKey(value)) dictSet[value] = new HashSet<TileImage>();
@@ -112,7 +149,7 @@ public class Day20
     [Fact]
     public void PartA()
     {
-        var tiles = GetTiles("a").ToList();
+        var tiles = GetTiles("Sample").ToList();
         var imageWidth = (int) Math.Sqrt(tiles.Count);
         Dictionary<ushort, ISet<TileImage>> tilesBySideValues = new Dictionary<ushort, ISet<TileImage>>();
         foreach(var tile in tiles)
@@ -123,21 +160,24 @@ public class Day20
             Day20.AddTileImageToSetDictionary(tilesBySideValues, tile, tile.Right);
         }
 
-        bool hasOneMatch = true;
-        while(hasOneMatch)
+        var tileImage = tilesBySideValues.Values.FirstOrDefault(values => values.Count == 1)?.First();
+        //while (tileImage != default) // TODO: Do something here
         {
-            foreach(var tileSet in tilesBySideValues.Values)
-            {
-                if (tileSet.Count == 1)
-                {
-                    var tileImage = tileSet.First();
-                    tilesBySideValues[tileImage.Top].Remove(tileImage);
-                    tilesBySideValues[tileImage.Bottom].Remove(tileImage);
-                    tilesBySideValues[tileImage.Left].Remove(tileImage);
-                    tilesBySideValues[tileImage.Right].Remove(tileImage);
+            tilesBySideValues[tileImage.Top].Remove(tileImage);
+            tilesBySideValues[tileImage.Bottom].Remove(tileImage);
+            tilesBySideValues[tileImage.Left].Remove(tileImage);
+            tilesBySideValues[tileImage.Right].Remove(tileImage);
 
-                }
-            }
+            _output.WriteLine(tileImage.ToString());
+            tileImage.FlipVertical();
+            _output.WriteLine(tileImage.ToString());
+
+            Day20.AddTileImageToSetDictionary(tilesBySideValues, tileImage, tileImage.Top);
+            Day20.AddTileImageToSetDictionary(tilesBySideValues, tileImage, tileImage.Bottom);
+            Day20.AddTileImageToSetDictionary(tilesBySideValues, tileImage, tileImage.Left);
+            Day20.AddTileImageToSetDictionary(tilesBySideValues, tileImage, tileImage.Right);
+
+            tileImage = tilesBySideValues.Values.FirstOrDefault(values => values.Count == 1)?.First();
         }
 
         Assert.Equal(10, tilesBySideValues.Count);
