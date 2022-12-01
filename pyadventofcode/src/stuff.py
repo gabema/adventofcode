@@ -3,6 +3,37 @@ Common functions and utilities used to complete advent of code challenges
 """
 import io
 import re
+import time
+
+def expected(func, fileName, expectedOutput) :
+    start = time.perf_counter_ns()
+    output = func(fileName)
+    duration = (time.perf_counter_ns() - start) / 1000
+    if output == expectedOutput :
+        output = "(%dms) Success" % duration
+    else :
+        output = "(%dms) Failed! Got %s expected %s" % (duration, output, expectedOutput)
+    return output
+
+def readIntLinesArrays(fileName) :
+    '''
+    Given a file path parse the contents expected to contain lists of
+    integers.
+    Returns an iterator that returns lists of lists of ints.
+    '''
+    lines = readContentsByLine(fileName)
+    lines = [l.strip('\n') for l in lines]    
+    ints = []
+    for l in lines :
+        try :
+            ints.append(int(l))
+        except ValueError:
+            if len(ints) > 0 :
+                yield ints
+                ints = []
+
+    if len(ints) > 0 :
+        yield ints
 
 def readContents(fileName) :
     """

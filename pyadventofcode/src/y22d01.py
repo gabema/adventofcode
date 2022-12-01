@@ -5,20 +5,8 @@ import os
 import stuff
 
 def calorieSums(fileName) :
-    lines = stuff.readContentsByLine(fileName)
-    lines = [l.strip('\n') for l in lines]
-    calories = []
-    elves = []
-    for l in lines :
-        if l == '' :
-            elves.append(calories)
-            calories = []
-        else :
-            calories.append(int(l))
-
-    calSums = []
-    for e in elves :
-        calSums.append(sum(e))
+    elves = [s for s in stuff.readIntLinesArrays(fileName)]
+    calSums = [sum(e) for e in elves]
     return calSums
 
 def part1(fileName) :
@@ -32,7 +20,9 @@ def part2(fileName) :
     return sum(sums)
 
 if __name__ == "__main__" :
-    #fileName = os.path.dirname(__file__) + '/y22d01Sample.txt'
+    sampleFileName = os.path.dirname(__file__) + '/y22d01Sample.txt'
     fileName = os.path.dirname(__file__) + '/y22d01.txt'
-    print(part1(fileName))
-    print(part2(fileName))
+    print(stuff.expected(part1, sampleFileName, 24000))
+    print(stuff.expected(part1, fileName, 68442))
+    print(stuff.expected(part2, sampleFileName, 45000))
+    print(stuff.expected(part2, fileName, 204837))

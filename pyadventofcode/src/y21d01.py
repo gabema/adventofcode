@@ -47,7 +47,6 @@ def part2(fileName) :
     return sumIncreasing
 
 if __name__ == "__main__" :
-    #fileName = os.path.dirname(__file__) + '/y21d01Sample.txt'
     fileName = os.path.dirname(__file__) + '/y21d01.txt'
-    print(part1(fileName))
-    print(part2(fileName))
+    print(stuff.expected(part1, fileName, 1502))
+    print(stuff.expected(part2, fileName, 1538))

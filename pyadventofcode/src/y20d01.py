@@ -6,7 +6,7 @@ import stuff
 
 def part1(fileName) :
     nums = [int(a) for a in stuff.readContentsByLine(fileName)]
-    count = len(nums);
+    count = len(nums)
     for i in range(count) :
         for j in range(i, count) :
             if nums[i] + nums[j] == 2020 :
@@ -15,7 +15,7 @@ def part1(fileName) :
 
 def part2(fileName) :
     nums = [int(a) for a in stuff.readContentsByLine(fileName)]
-    count = len(nums);
+    count = len(nums)
     for i in range(count) :
         for j in range(i, count) :
             for k in range(j, count) :
@@ -25,5 +25,5 @@ def part2(fileName) :
 
 if __name__ == "__main__" :
     fileName = os.path.dirname(__file__) + '/y20d01.txt'
-    print(part1(fileName))
-    print(part2(fileName))
+    print(stuff.expected(part1, fileName, 692916))
+    print(stuff.expected(part2, fileName, 289270976))

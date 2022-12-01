@@ -14,4 +14,4 @@ def part1(fileName) :
 
 if __name__ == '__main__' :
     fileName = os.path.dirname(__file__) + '/y20d20.txt'
-    print(f"Part1: {part1(fileName)}")
+    stuff.expected(part1, fileName, 0)
