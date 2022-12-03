@@ -55,7 +55,6 @@ def readOpPacket(it, op) :
         bitsRead += 15
         totalLenInBits = int(val, base=2)
 
-    #todo parse subpackets
     subpackets = []
     if numSubPackets > 0 :
         for _ in range(numSubPackets) :
