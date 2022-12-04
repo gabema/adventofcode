@@ -15,6 +15,25 @@ def readTile(fileName) :
         right = ''.join([c[-1] for c in contents])
         yield(int(tileNum), top, left, bottom, right)
 
+def tileIterator(tile) :
+    t1 = tile
+    t2 = flipTile(tile)
+    yield t1
+    yield t2
+    t1 = rotateTileRight(t1)
+    t2 = rotateTileRight(t2)
+    yield t1
+    yield t2
+    t1 = rotateTileRight(t1)
+    t2 = rotateTileRight(t2)
+    yield t1
+    yield t2
+    t1 = rotateTileRight(t1)
+    t2 = rotateTileRight(t2)
+    yield t1
+    yield t2
+
+
 uniqueTopTiles = lambda tiles : uniqueSideTiles(tiles, 1, 3)
 uniqueBottomTiles = lambda tiles : uniqueSideTiles(tiles, 3, 1)
 uniqueLeftTiles = lambda tiles : uniqueSideTiles(tiles, 2, 4)
@@ -34,11 +53,14 @@ def flipTile(tiles, tileNum) :
         if tiles[i][0] == tileNum :
             index = i
             break
-    
-    _, top, left, bottom, right = tiles[index]
+
+    tiles[index] = flipTile(tiles[index])
+
+def flipTile(tile) :    
+    tileNum, top, left, bottom, right = tile
     newLeft = left[::-1]
     newRight = right[::-1]
-    tiles[index] = (tileNum, bottom, newLeft, top, newRight)
+    return (tileNum, bottom, newLeft, top, newRight)
 
 def rotateTileRight(tiles, tileNum) :
     index = 0
@@ -47,14 +69,26 @@ def rotateTileRight(tiles, tileNum) :
             index = i
             break
 
-    _, top, left, bottom, right = tiles[index]
+    tiles[index] = rotateTileRight(tiles[index])
+
+def rotateTileRight(tile) :
+    tileNum, top, left, bottom, right = tile
     newRight = top
     newBottom = right[::-1]
     newLeft = bottom
     newTop = left[::-1]
-    tiles[index] = (tileNum, newTop, newLeft, newBottom, newRight)
+    return (tileNum, newTop, newLeft, newBottom, newRight)
 
 def part1(fileName) :
+    possibleTiles = []
+    for tile in readTile(fileName) :
+        for pt in tileIterator(tile) :
+            possibleTiles.append(pt)
+
+    print(possibleTiles)
+    print(len(possibleTiles))
+
+def part1Brute(fileName) :
     '''
     2971 TOP/LEFT
     3079 BOTTOM/RIGHT
