@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <Folder Include="Year2022\" />
-    <Folder Include="Year2023\" />
   </ItemGroup>
 
 </Project>
