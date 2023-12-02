@@ -9,19 +9,25 @@ using Xunit.Abstractions;
 // https://adventofcode.com/2023/day/2
 public class Day2
 {
+    private const string RED = "red";
+    private const string GREEN = "green";
+    private const string BLUE = "blue";
+
     private readonly ITestOutputHelper output;
     private static readonly Regex gameExp = new Regex(@"Game (\d+): (.*)");
     private static readonly Regex colorExp = new Regex(@"(\d+) (\w+)");
+
+    record CubeGame(int GameNumber, List<List<CubeSet>> CubeSets);
+    record CubeSet(string color, int count);
+
     public Day2(ITestOutputHelper output)
     {
         this.output = output;
     }
 
-    record CubeGame(int GameNumber, List<List<CubeSet>> CubeSets);
-    record CubeSet(string color, int count);
-    private IEnumerable<string> GameEnumerable()
+    private IEnumerable<string> GameEnumerable(string variant)
     {
-        using var reader = InputClient.GetFileStreamReader(2023, 2, "");
+        using var reader = InputClient.GetFileStreamReader(2023, 2, variant);
         string line;
 
         while ((line = reader.ReadLine()) != null)
@@ -48,9 +54,9 @@ public class Day2
             yield return new CubeSet(count: int.Parse(m.Groups[1].Value), color: m.Groups[2].Value);
         }
     }
-    private IEnumerable<CubeGame> GetGame()
+    private IEnumerable<CubeGame> GetGame(string variant)
     {
-        foreach (var gameLine in GameEnumerable())
+        foreach (var gameLine in GameEnumerable(variant))
         {
             var gameMatch = gameExp.Match(gameLine);
 
@@ -62,38 +68,28 @@ public class Day2
     public void PartA()
     {
         var possibleGameIdSums = 0;
-        var maxColorCounts = new Dictionary<string, int>()
-        {
-            ["blue"] = 14,
-            ["green"] = 13,
-            ["red"] = 12
-        };
+        var maxColorCounts = new Dictionary<string, int>();
+        var colorCubeCounts = new Dictionary<string, int>();
 
-        var colorCubeCounts = new Dictionary<string, int>()
-        {
-            ["blue"] = 0,
-            ["green"] = 0,
-            ["red"] = 0
-        };
+        SetDictionaryValues(maxColorCounts, red:12, green:13, blue:14);
+        SetDictionaryValues(colorCubeCounts, 0, 0, 0);
 
-        foreach (var game in GetGame())
+        foreach (var game in GetGame(string.Empty))
         {
             var gameFails = false;
 
             foreach (var cubesets in game.CubeSets)
             {
-                colorCubeCounts["blue"] = 0;
-                colorCubeCounts["green"] = 0;
-                colorCubeCounts["red"] = 0;
+                SetDictionaryValues(colorCubeCounts, 0, 0, 0);
 
                 foreach (var cs in cubesets)
                 {
                     colorCubeCounts[cs.color] += cs.count;
                 }
 
-                if (maxColorCounts["red"] < colorCubeCounts["red"]
-                    || maxColorCounts["green"] < colorCubeCounts["green"]
-                    || maxColorCounts["blue"] < colorCubeCounts["blue"]
+                if (maxColorCounts[RED] < colorCubeCounts[RED]
+                    || maxColorCounts[GREEN] < colorCubeCounts[GREEN]
+                    || maxColorCounts[BLUE] < colorCubeCounts[BLUE]
                     )
                 {
                     //output.WriteLine($"Game {game.GameNumber} failed! R{maxColorCounts["red"]},G{maxColorCounts["green"]},B{maxColorCounts["blue"]} | R{colorCubeCounts["red"]},G{colorCubeCounts["green"]},B{colorCubeCounts["blue"]}");
@@ -117,42 +113,39 @@ public class Day2
     {
         var possibleGameIdSums = 0L;
 
-        var colorCubeCounts = new Dictionary<string, int>()
-        {
-            ["blue"] = 0,
-            ["green"] = 0,
-            ["red"] = 0
-        };
+        var colorCubeCounts = new Dictionary<string, int>();
+        var minColorCountsForGame = new Dictionary<string, int>();
 
-        foreach (var game in GetGame())
+        foreach (var game in GetGame(string.Empty))
         {
-            var minColorCountsForGame = new Dictionary<string, int>()
-            {
-                ["blue"] = 0,
-                ["green"] = 0,
-                ["red"] = 0
-            };
+            SetDictionaryValues(minColorCountsForGame, 0, 0, 0);
+            SetDictionaryValues(colorCubeCounts, 0, 0, 0);
 
             foreach (var cubesets in game.CubeSets)
             {
-                colorCubeCounts["blue"] = 0;
-                colorCubeCounts["green"] = 0;
-                colorCubeCounts["red"] = 0;
+                SetDictionaryValues(colorCubeCounts, 0, 0, 0);
 
                 foreach (var cs in cubesets)
                 {
                     colorCubeCounts[cs.color] += cs.count;
                 }
 
-                if (colorCubeCounts["blue"] > minColorCountsForGame["blue"]) { minColorCountsForGame["blue"] = colorCubeCounts["blue"];  }
-                if (colorCubeCounts["green"] > minColorCountsForGame["green"]) { minColorCountsForGame["green"] = colorCubeCounts["green"]; }
-                if (colorCubeCounts["red"] > minColorCountsForGame["red"]) { minColorCountsForGame["red"] = colorCubeCounts["red"]; }
+                if (colorCubeCounts[BLUE] > minColorCountsForGame[BLUE]) { minColorCountsForGame[BLUE] = colorCubeCounts[BLUE];  }
+                if (colorCubeCounts[GREEN] > minColorCountsForGame[GREEN]) { minColorCountsForGame[GREEN] = colorCubeCounts[GREEN]; }
+                if (colorCubeCounts[RED] > minColorCountsForGame[RED]) { minColorCountsForGame[RED] = colorCubeCounts[RED]; }
             }
 
-            var gamePower = minColorCountsForGame["blue"] * minColorCountsForGame["green"] * minColorCountsForGame["red"];
+            var gamePower = minColorCountsForGame[BLUE] * minColorCountsForGame[GREEN] * minColorCountsForGame[RED];
             possibleGameIdSums += gamePower;
         }
 
         Assert.Equal(66016, possibleGameIdSums);
+    }
+
+    private static void SetDictionaryValues(Dictionary<string, int> dict, int red, int green, int blue)
+    {
+        dict[RED] = red;
+        dict[GREEN] = green;
+        dict[BLUE] = blue;
     }
 }
