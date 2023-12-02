@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Globalization;
-using System.Linq;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 
 namespace AdventOfCode.Year2021;

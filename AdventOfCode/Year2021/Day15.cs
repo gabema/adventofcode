@@ -48,6 +48,44 @@ public class Day15
             CurrentPathRisk = copy.CurrentPathRisk;
             VisitedIndexes = new HashSet<int>(copy.VisitedIndexes);
         }
+
+        public bool Go(Direction direction)
+        {
+            var nextIndex = 0;
+            switch(direction)
+            {
+                case Direction.Left:
+                    {
+                        nextIndex = CurrentPosition - 1;
+                        if (nextIndex % MapWidthHeight == MapWidthHeight - 1) return false; // left column
+                        if (nextIndex < 0) return false; // 0 position;
+                        break;
+                    }
+                case Direction.Right:
+                    {
+                        nextIndex = CurrentPosition + 1;
+                        if (nextIndex % MapWidthHeight == 0) return false; // right column
+                        if (nextIndex == MapWidthHeight * MapWidthHeight) return false; // beyond end
+                        break;
+                    }
+                case Direction.Down:
+                    {
+                        nextIndex = CurrentPosition + MapWidthHeight;
+                        if (nextIndex >= MapWidthHeight * MapWidthHeight) return false;
+                        break;
+                    }
+                case Direction.Up:
+                    {
+                        nextIndex = CurrentPosition - MapWidthHeight;
+                        if (nextIndex < 0) return false;
+                        break;
+                    }
+            }
+            if (VisitedIndexes.Contains(nextIndex)) return false; // already visited
+            CurrentPosition = nextIndex;
+            VisitedIndexes.Add(nextIndex);
+            return true;
+        }
     }
 
     enum Direction
@@ -64,10 +102,7 @@ public class Day15
         var map = ReadRiskMap("Sample");
         var stats = new Stats();
 
-        foreach(var direction in Enum.GetValues(typeof(Direction)))
-        {
 
-        }
 
         Assert.True(false);
     }

@@ -73,14 +73,14 @@ public class DayLexer
         _output = output;
     }
 
-    [Fact]
+    [Fact(Skip = "Template")]
     public void PartA()
     {
         var objects = GetObjects(2021,1,"Sample");
         Assert.True(false);
     }
 
-    [Fact]
+    [Fact(Skip = "Template")]
     public void PartB()
     {
         Assert.True(false);

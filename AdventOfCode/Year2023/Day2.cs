@@ -72,7 +72,6 @@ public class Day2
         var colorCubeCounts = new Dictionary<string, int>();
 
         SetDictionaryValues(maxColorCounts, red:12, green:13, blue:14);
-        SetDictionaryValues(colorCubeCounts, 0, 0, 0);
 
         foreach (var game in GetGame(string.Empty))
         {
@@ -119,7 +118,6 @@ public class Day2
         foreach (var game in GetGame(string.Empty))
         {
             SetDictionaryValues(minColorCountsForGame, 0, 0, 0);
-            SetDictionaryValues(colorCubeCounts, 0, 0, 0);
 
             foreach (var cubesets in game.CubeSets)
             {
