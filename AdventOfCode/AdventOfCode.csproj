@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-
+    <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -27,6 +27,12 @@
 
   <ItemGroup>
     <Folder Include="Year2022\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Year2023\Day3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
