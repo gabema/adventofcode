@@ -2,10 +2,13 @@
 https://adventofcode.com/2022/day/5
 https://programming-idioms.org/cheatsheet/Python
 https://regex101.com/
+https://github.com/subhajeet2107/pylexer/
 '''
 import os
 import stuff
 import re
+
+from pylex import PyLexer
 
 def moveCrates(move, stacks) :
     numToMove, source, destination = move
@@ -19,6 +22,22 @@ def moveCratesV2(move, stacks) :
     crates = stacks[source][numToTakeOff:]
     stacks[destination] += crates
     stacks[source] = stacks[source][0:numToTakeOff]
+
+def move2(fileName, moveFunc) :
+    config = {
+        r'\s' :'',
+        r'\d+' :'number',
+        r'\+' : 'plus',
+        r'-': 'minus',
+        r'\*' : 'mul',
+        r'/' : 'div',
+        r'\[(\w)\]': 'crate',
+        r'move (\d+) from (\d+) to (\d+)': 'move'
+    }
+    tokens = PyLexer.scan(config, '2 + 3')
+    m = map(lambda x:x.get_name(), tokens)
+    print(tokens)
+    print(m)
 
 def move(fileName, moveFunc) :
     indexes = [0,1,5,9,13,17,21,25,29,33]
@@ -51,7 +70,7 @@ def move(fileName, moveFunc) :
     return output
 
 def part1(fileName) :
-    return move(fileName, moveCrates)
+    return move2(fileName, moveCrates)
 
 def part2(fileName) :
     return move(fileName, moveCratesV2)
@@ -60,6 +79,6 @@ if __name__ == "__main__" :
     sampleFileName = os.path.dirname(__file__) + '/y22d05Sample.txt'
     fileName = os.path.dirname(__file__) + '/y22d05.txt'
     print(stuff.expected(part1, sampleFileName, 'CMZ'))
-    print(stuff.expected(part1, fileName, 'GFTNRBZPF'))
-    print(stuff.expected(part2, sampleFileName, 'MCD'))
-    print(stuff.expected(part2, fileName, 'VRQWPDSGP'))
+#    print(stuff.expected(part1, fileName, 'GFTNRBZPF'))
+#    print(stuff.expected(part2, sampleFileName, 'MCD'))
+#    print(stuff.expected(part2, fileName, 'VRQWPDSGP'))

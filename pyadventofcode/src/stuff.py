@@ -56,3 +56,45 @@ def readContentsByLine(fileName) :
 def readStructuredContents(fileName, regExp, flags = None) :
     contents = readContents(fileName)
     return re.findall(regExp, contents, flags)
+
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = self
+        self.prev = self
+
+    def __str__(self) :
+        return str(self.data)
+
+    def __repr__(self):
+        return self.data
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def __repr__(self):
+        node = self.head
+        return " -> ".join(self)
+
+    def __getitem__(self, sentinel) :
+        pass
+
+    def __iter__(self) :
+        node = self.head
+        head = self.head
+        if head != None :
+            yield head
+            node = head.next
+
+        while(node != head) :
+            node = node.next
+            yield node
+
+
+    def append(self, data) :
+        node = Node(data)
+        if self.head == None :
+            self.head = node
+        else :
+            self.head.prev, node.prev, node.next = node, self.head.prev, self.head

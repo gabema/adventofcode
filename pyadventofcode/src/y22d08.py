@@ -15,23 +15,31 @@ def readTrees2(fileName) :
     rows = len(treeValues)
     columns = len(treeValues[0])
     maxHeights = {
-        'ViewFromTop': -1,
+        'ViewFromTop': [-1] * columns,
         'ViewFromBottom': [-1] * columns,
         'ViewFromLeft': [-1] * rows,
-        'ViewFromRight': -1,
+        'ViewFromRight': [-1] * rows,
     }
     visibility = [[False for _ in range(columns)] for _ in range(rows)]
-    viewableFrom(treeValues, maxHeights,visibility, 0, rows, 1, 0, columns, 1, 'ViewFromLeft')
-    viewableFrom(treeValues, maxHeights,visibility, rows-1, -1, -1, columns-1, -1, -1, 'ViewFromBottom')
+    viewableFrom(treeValues, maxHeights,visibility,      0, rows,  1,         0, columns,  1, 'ViewFromLeft')
+    viewableFrom(treeValues, maxHeights,visibility, rows-1,   -1, -1, columns-1,      -1, -1, 'ViewFromBottom')
+    viewableFrom(treeValues, maxHeights,visibility,      0, rows,  1,         0, columns,  1, 'ViewFromTop')
+    viewableFrom(treeValues, maxHeights,visibility, rows-1,   -1, -1, columns-1,      -1, -1, 'ViewFromRight')
+    return treeValues
 
 def viewableFrom(trees, maxHeights, visibility, startRow, endRow, rowInc, startColumn, endCol, colInc, maxName) :
-    rows = len(trees)
-    columns = len(trees[0])
-    for y in range(startRow, endRow, rowInc) :
+    if maxName == 'ViewFromTop' or maxName == 'ViewFromBottom' :
+        for y in range(startRow, endRow, rowInc) :
+            for x in range(startColumn, endCol, colInc) :
+                if trees[y][x] > maxHeights[maxName][y] :
+                    visibility[y][x] = True
+                    maxHeights[maxName][y] = trees[y][x]
+    else :
         for x in range(startColumn, endCol, colInc) :
-            if trees[y][x] > maxHeights[maxName][y] :
-                visibility[y][x] = True
-                maxHeights[maxName][y] = trees[y][x]
+            for y in range(startRow, endRow, rowInc) :
+                if trees[y][x] > maxHeights[maxName][x] :
+                    visibility[y][x] = True
+                    maxHeights[maxName][x] = trees[y][x]
 
 
 def readTrees(fileName) :
