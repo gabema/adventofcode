@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -55,7 +56,7 @@ class Value(char? v)
         }
     }
 
-    override public string ToString() => v?.ToString() ?? ".";
+    // override public string ToString() => v?.ToString() ?? ".";
 }
 
 record Spot(Location Location, Value Value);
@@ -77,15 +78,29 @@ public class Day4(ITestOutputHelper output)
         }
     }
 
-    static IEnumerable<Spot> GetX(Dictionary<Location, Spot> map)
+    static IEnumerable<Spot> GetLetter(Dictionary<Location, Spot> map, char value)
     {
         foreach (var spot in map.Values)
         {
-            if (spot.Value.V == 'X')
+            if (spot.Value.V == value)
             {
                 yield return spot;
             }
         }
+    }
+
+    private static bool HasMas(Dictionary<Location, Spot> map, Spot aSpot)
+    {
+        var upperLeft = map.GetValueOrDefault(aSpot.Location.FromDirection(Direction.UpperLeft));
+        var upperRight = map.GetValueOrDefault(aSpot.Location.FromDirection(Direction.UpperRight));
+        var lowerLeft = map.GetValueOrDefault(aSpot.Location.FromDirection(Direction.LowerLeft));
+        var lowerRight = map.GetValueOrDefault(aSpot.Location.FromDirection(Direction.LowerRight));
+        if (upperLeft is null || upperRight is null || lowerLeft is null || lowerRight is null) return false;
+        HashSet<char> mas1 = [upperLeft.Value.V!.Value, lowerRight.Value.V!.Value];
+        HashSet<char> mas2 = [upperRight.Value.V!.Value, lowerLeft.Value.V!.Value];
+        HashSet<char> chars = ['M', 'S'];
+        if (chars.SetEquals(mas1) && mas1.SetEquals(mas2)) return true;
+        return false;
     }
 
     private static bool HasLettersFromNeighbors(Dictionary<Location, Spot> map, Spot spot, string letters, Direction direction)
@@ -127,7 +142,7 @@ public class Day4(ITestOutputHelper output)
         }
 
         int countXmas = 0;
-        foreach(var xSpot in GetX(map))
+        foreach(var xSpot in GetLetter(map, 'X'))
         {
             foreach(var d in Enum.GetValues<Direction>())
             {
@@ -136,5 +151,34 @@ public class Day4(ITestOutputHelper output)
         }
 
         Assert.Equal(2642, countXmas);
+    }
+
+    [Fact]
+    public void PartB()
+    {
+        using var reader = InputClient.GetFileStreamReader(2024, 4, "a");
+        string? line;
+        Location loc = Location.Origin;
+        Dictionary<Location, Spot> map = [];
+
+        // Read in input
+        while ((line = reader.ReadLine()) != null)
+        {
+            foreach (var c in line)
+            {
+                var spot = CachedLocationGetter(map, loc);
+                spot.Value.V = c;
+                loc = loc.FromDirection(Direction.Right);
+            }
+            loc = loc.NewRow;
+        }
+
+        int countXmas = 0;
+        foreach(var aSpot in GetLetter(map, 'A'))
+        {
+            if (HasMas(map, aSpot)) countXmas++;
+        }
+
+        Assert.Equal(1974, countXmas);
     }
 }
